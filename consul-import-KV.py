@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+
+"""
+version 1.0 Author: Ledivan B. Marques
+            Email:	ledivan_bernardo@yahoo.com.br
+"""
 import os
 import sys
 import requests,json
