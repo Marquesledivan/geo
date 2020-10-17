@@ -2,10 +2,8 @@
 # -*- coding: utf-8 -*-
 """
 version 1.0 Author: Ledivan B. Marques
-            Email:	ledivan@cvc.com.br
-
+            Email:	ledivan_bernardo@yahoo.com.br
 """
-
 import subprocess
 
 result = subprocess.check_output("""aws ecr describe-repositories --query 'repositories[*].repositoryName' --profile desenvolvimento | jq .[] | sed 's|"||g'""", shell=True)
