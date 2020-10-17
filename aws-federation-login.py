@@ -1,4 +1,10 @@
 #!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
+"""
+version 1.0 Author: Ledivan B. Marques
+            Email:	ledivan_bernardo@yahoo.com.br
+"""
 
 import sys
 import boto.sts
