@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/python2.7
+"""
+version 1.0 Author: Ledivan B. Marques
+            Email:	ledivan_bernardo@yahoo.com.br
+"""
 import pymssql
 import os
 import httplib
