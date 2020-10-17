@@ -1,4 +1,9 @@
 
+"""
+version 1.0 Author: Ledivan B. Marques
+            Email:	ledivan_bernardo@yahoo.com.br
+"""
+
 import requests
 import json
 from datetime import date
