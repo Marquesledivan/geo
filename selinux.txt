@@ -1,0 +1,23 @@
+
+ yum install selinux-policy-minimum -y
+
+getsebool -a
+
+setsebool -P virt_use_usb off
+
+yum install policycoreutils-gui
+
+system-config-selinux
+
+aureport
+ausearch -m AVC
+
+
+semanage fcontext -a -t postgresql_db_t "/opt/postgresql(/.*)?"
+restorecon -R -v /opt/postgresql
+
+semanage fcontext -a -t httpd_sys_content_t "/srv/www/html(/.*)?"
+
+restorecon -R -v /srv/www/html/
+
+postgresql_db_t
