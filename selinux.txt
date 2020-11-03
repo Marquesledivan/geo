@@ -12,6 +12,8 @@ system-config-selinux
 aureport
 ausearch -m AVC
 
+ls -Z
+
 semanage fcontext -l | grep -i httpd
 
 semanage fcontext -a -t postgresql_db_t "/opt/postgresql(/.*)?"
