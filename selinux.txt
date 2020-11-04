@@ -1,3 +1,11 @@
+https://qastack.com.br/superuser/768842/why-is-my-yum-update-failing
+
+ln -s  /mnt/hgfs/rpm/packages /opt/packages
+createrepo  -v /opt/packages
+yum clean all
+yum update
+
+
 
  yum install selinux-policy-minimum -y
 
