@@ -1,3 +1,21 @@
+Uearemos um cliente SSH para acessar o Servidor da
+PS1='\n(\e[31;1m\u\e[33;0m@\e[36;1m[m - \w @\e[32;1m\t\e[m) \n\l:> '
+Black='\e[0;30m' # Black
+Red='\e[31;1m' # Red Negrito
+Green='\e[32;1m' # Green
+Yellow='\e[0;33m' # Yellow
+Blue='\e[34;1m' # Blue Negrito
+Purple='\e[0;35m' # Purple
+Cyan='\e[0;36m' # Cyan
+White='\e[37;1m' # White
+
+export PS1="\n\[$Blue\]\[\033(0\]l\[\033(B\][\[$White\]\u@\h\[$Blue\]]-[\[$White\]
+\'if [ \$? = 0 ]; then echo \[\e[33m\]?\e[0m\]; else echo \[\e[31m\]X\[\e[0m\];
+fi\`\[$Blue\]]?[\[$White\]\w\[$Blue\]]\n\[$Blue\]\[\033(0\]m\[\033(B\][\$Red\]\
+$(/bin/ls -1 | /usr/bin/wc -l | /bin/sed 's: ::g') Files\[$Blue\]]?\[\033(B\]
+[\[$Green\]\#\[#Blue\]] ?> \[\e[0m\]"
+
+
 https://qastack.com.br/superuser/768842/why-is-my-yum-update-failing
 
 ln -s  /mnt/hgfs/rpm/packages /opt/packages
