@@ -16,6 +16,20 @@ $(/bin/ls -1 | /usr/bin/wc -l | /bin/sed 's: ::g') Files\[$Blue\]]?\[\033(B\]
 [\[$Green\]\#\[#Blue\]] ?> \[\e[0m\]"
 
 
+https://www.systutorials.com/docs/linux/man/8-pam_selinux/ 
+
+session  required pam_selinux.so nottys open
+
+
+
+account  include system-auth
+
+session  required pam_selinux.so close
+session  required pam_selinux.so nottys open
+session  required pam_loginuid.so
+session  include system-auth
+
+
 https://qastack.com.br/superuser/768842/why-is-my-yum-update-failing
 
 ln -s  /mnt/hgfs/rpm/packages /opt/packages
