@@ -21,6 +21,8 @@ https://www.systutorials.com/docs/linux/man/8-pam_selinux/
 session  required pam_selinux.so nottys open
 
 
+https://www.systutorials.com/docs/linux/man/1-audit2allow/
+
 
 account  include system-auth
 
