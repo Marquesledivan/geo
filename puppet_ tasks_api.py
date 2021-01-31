@@ -1,9 +1,8 @@
 #!/usr/local/bin/python3
 # -*- coding: utf-8 -*-
-
 """
 version 1.0 Author: Ledivan B. Marques
-            Email:	ledivan_bernardo@yahoo.com.br
+            Email: ledivan_bernardo@yahoo.com.br
 """
 
 import requests
@@ -17,8 +16,8 @@ requests.packages.urllib3.disable_warnings()
 jobs = []
 
 def login_api():
-     user = input("Digite seu user:")
-     passwd = getpass.getpass("Digite sua senha: ")
+     user = input("User:")
+     passwd = getpass.getpass("Password: ")
      lifetime = "10m"
      data = {"login": user,"password": passwd, "lifetime": lifetime,"label": "four-hour token"}
      payload = json.dumps(data)
@@ -59,11 +58,32 @@ def orchestrator_jobs(jobs):
      i = json.loads(r.text)
      print(i["options"]["scope"]["nodes"],i["state"])
 
+def connect_status(nodes):
+     token = check_token()
+     headers={'Content-type': 'application/json', 'X-Authentication': token}
+     r = requests.get(f'https://master.ledivan.com.br:8143/orchestrator/v1/inventory/{nodes}',headers=headers,verify=False)
+     if json.loads(r.text)["connected"] == True:
+         return True
+     elif json.loads(r.text)["connected"] == False:
+         return False
+
+def stdout_jobs(jobs):
+     token = check_token()
+     headers={'Content-type': 'application/json', 'X-Authentication': token}
+     r = requests.get(f'https://master.ledivan.com.br:8143/orchestrator/v1/jobs/{jobs}/nodes',headers=headers,verify=False)
+     for i in json.loads(r.text)["items"]:
+         print("Hostname:", i["name"], "Stdout:\n", i["result"]["stdout"])
 
 if __name__ == "__main__":
     f = open("hosts.txt", "r")
     hosts = f.read()
     for i in hosts.splitlines():
-        run_task("ls -lha", i)
+        status = connect_status(i)
+        if status == True:
+            run_task("systemctl status puppet", i)
+        elif status == False:
+            print("Host desconectado PXP:", i)
     for i in jobs:
         orchestrator_jobs(i)
+    for i in jobs:
+        stdout_jobs(i)
