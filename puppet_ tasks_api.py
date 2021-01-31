@@ -1,9 +1,4 @@
 #!/usr/local/bin/python3
-# -*- coding: utf-8 -*-
-"""
-version 1.0 Author: Ledivan B. Marques
-            Email:	ledivan_bernardo@yahoo.com.br
-"""
 
 import requests
 import pprint
@@ -18,7 +13,8 @@ jobs = []
 def login_api():
      user = input("Digite seu user:")
      passwd = getpass.getpass("Digite sua senha: ")
-     data = {"login": user,"password": passwd, "lifetime": "4h","label": "four-hour token"}
+     lifetime = "10m"
+     data = {"login": user,"password": passwd, "lifetime": lifetime,"label": "four-hour token"}
      payload = json.dumps(data)
      headers={'Content-type': 'application/json'}
      r = requests.post("https://master.ledivan.com.br:4433/rbac-api/v1/auth/token",verify=False,data=payload,headers=headers)
