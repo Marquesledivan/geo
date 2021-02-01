@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 version 1.0 Author: Ledivan B. Marques
-            Email: ledivan_bernardo@yahoo.com.br
+            Email:	ledivan_bernardo@yahoo.com.br
 """
 
 import requests
@@ -24,16 +24,18 @@ def login_api():
      headers={'Content-type': 'application/json'}
      r = requests.post("https://master.ledivan.com.br:4433/rbac-api/v1/auth/token",verify=False,data=payload,headers=headers)
      token = r.json()["token"]
-     f = open("token.txt", "w")
-     f.write(token)
-     f = open("token.txt", "r")
-     return f.read()
-
+     with open("token.txt", "w") as f:
+         f.write(token)
+         f.close()
+     with open("token.txt", "r") as f:
+         return f.read()
+         f.close()
 
 def check_token():
     try:
-        f = open("token.txt", "r")
-        token = f.read()
+        with open("token.txt", "r") as f:
+            token = f.read()
+            f.close()
         headers={'Content-type': 'application/json', 'X-Authentication': token}
         uri = requests.get("https://master.ledivan.com.br:4433/rbac-api/v1/users/current",headers=headers,verify=False)
         if uri.status_code != 200:
@@ -41,6 +43,7 @@ def check_token():
     except FileNotFoundError as e:
         token = login_api()
     return token
+
 
 def run_task(command,nodes):
      token = check_token()
@@ -75,12 +78,13 @@ def stdout_jobs(jobs):
          print("Hostname:", i["name"], "Stdout:\n", i["result"]["stdout"])
 
 if __name__ == "__main__":
-    f = open("hosts.txt", "r")
-    hosts = f.read()
+    with open("hosts.txt", "r") as f:
+        hosts = f.read()
+        f.close()
     for i in hosts.splitlines():
         status = connect_status(i)
         if status == True:
-            run_task("systemctl status puppet", i)
+            run_task("ls -lha", i)
         elif status == False:
             print("Host desconectado PXP:", i)
     for i in jobs:
