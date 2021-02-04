@@ -34,7 +34,7 @@ headers={"X-Vault-Token": "XXXXXXX"}
 
 response = requests.get("http://127.0.0.1:8200/v1/secret/data/ledivan-teste",headers=headers)
 
-for i in json.loads(response.text)["data"]["data"].values():
-    print(i)
+print(json.loads(response.text)["data"]["data"]["ledivan"])
+
 
 ### curl  -H "X-Vault-Token: XXXXXXXX" -X GET http://127.0.0.1:8200/v1/secret/data/ledivan-teste |  python3 -c 'import sys, json; print (json.load(sys.stdin)["data"]["data"]["ledivan"])'
