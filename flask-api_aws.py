@@ -4,9 +4,8 @@
 version 1.0 Author: Ledivan B. Marques
             Email:	ledivan_bernardo@yahoo.com.br
 """
-from flask import Flask
-from flask import request
-from flask import jsonify
+
+from flask import Flask, request, jsonify
 from flask_api import FlaskAPI, status, exceptions
 import boto3
 import json
