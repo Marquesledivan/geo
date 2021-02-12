@@ -1,4 +1,5 @@
 #!/usr/local/bin/python3
+# https://puppet.com/docs/pe/2019.8/classification_endpoint_v2.html
 # -*- coding: utf-8 -*-
 """
 version 1.0 Author: Ledivan B. Marques
