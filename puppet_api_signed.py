@@ -8,94 +8,61 @@ version 1.0 Author: Ledivan B. Marques
 import requests
 import pprint
 import json
-import sys
+import getpass
+import os
 import requests.packages.urllib3
 requests.packages.urllib3.disable_warnings()
 
-certs = "/etc/puppetlabs/puppet/ssl/certs/"
-private_keys = "/etc/puppetlabs/puppet/ssl/private_keys/"
-state = "requested"
-db_hosts = []
-unsigned = []
-os = "ubuntu"
+jobs = []
 
-def puppet_db():
-    try:
-        db_hosts = []
-        headers = {'Content-type': 'application/json'}
-        r = requests.get("http://master.ledivan.com.br:8080/pdb/query/v4/nodes",headers=headers)
-        for i in r.json():
-            db_hosts.append(i["certname"])
-        return db_hosts
-    except json.decoder.JSONDecodeError as e:
-        print(e)
+def login_api():
+     user = input("User:")
+     passwd = getpass.getpass("Password: ")
+     lifetime = "10h"
+     data = {"login": user,"password": passwd, "lifetime": lifetime,"label": "four-hour token"}
+     payload = json.dumps(data)
+     headers={'Content-type': 'application/json'}
+     r = requests.post("https://10.0.0.10:4433/rbac-api/v1/auth/token",verify=False,data=payload,headers=headers)
+     token = r.json()["token"]
+     with open("token.txt", "w") as f:
+         f.write(token)
+         f.close()
+     with open("token.txt", "r") as f:
+         return f.read()
+         f.close()
 
-def get_certificados(hosts):
+def check_token():
     try:
-        headers = {'Content-type': 'application/json'}
-        r = requests.get(f'https://master.ledivan.com.br:8140/puppet-ca/v1/certificate_status/{hosts}' \
-        ,headers=headers,verify=False,cert=(f'{certs}master.ledivan.com.br.pem',"{}master.ledivan.com.br.pem".format(private_keys)))
-        d = r.json()
-        print(d["state"] + " "  + d["name"])
-    except json.decoder.JSONDecodeError as e:
-        print(e)
+        with open("token.txt", "r") as f:
+            token = f.read()
+            f.close()
+        headers={'Content-type': 'application/json', 'X-Authentication': token}
+        uri = requests.get("https://10.0.0.10:4433/rbac-api/v1/users/current",headers=headers,verify=False)
+        if uri.status_code != 200:
+            token = login_api()
+    except FileNotFoundError as e:
+        token = login_api()
+    return token
 
-def certificados_status():
-    unsigned = []
-    try:
-        headers = {'Content-type': 'application/json'}
-        r = requests.get(f'https://master.ledivan.com.br:8140/puppet-ca/v1/certificate_statuses/any_key' \
-        ,headers=headers,verify=False,cert=(f'{certs}master.ledivan.com.br.pem',"{}master.ledivan.com.br.pem".format(private_keys)))
-        for i in r.json():
-            unsigned.append(i['name'])
-    except json.decoder.JSONDecodeError as e:
-        print(e)
-    return unsigned
+lista = []
+def pre_task():
+     token = check_token()
+     headers={'Content-type': 'application/json', 'X-Authentication': token}
+     r = requests.get(f"http://10.0.0.10:8080/pdb/query/v4/nodes",headers=headers,verify=False)
+     for i in json.loads(r.text):
+          nodes = i["certname"]
+          if nodes.startswith("local"):
+              lista.append(nodes)
 
-def get_unsigned():
-    try:
-        headers = {'Content-type': 'application/json'}
-        r = requests.get(f'https://master.ledivan.com.br:8140/puppet-ca/v1/certificate_statuses/ignored?state={state}' \
-        ,headers=headers,verify=False,cert=(f'{certs}master.ledivan.com.br.pem',"{}master.ledivan.com.br.pem".format(private_keys)))
-        for i in json.loads(r.text):
-            if os in i["name"]:
-                unsigned.append(i["name"])
-    except json.decoder.JSONDecodeError as e:
-        print(e)
-
-def get_signed(hosts):
-    try:
-        headers = {'Content-type': 'application/json'}
-        data = {"desired_state":"signed"}
-        payload = json.dumps(data)
-        r = requests.put(f'https://master.ledivan.com.br:8140/puppet-ca/v1/certificate_status/{hosts}' \
-        ,data=payload,headers=headers,verify=False,cert=(f'{certs}master.ledivan.com.br.pem',"{}master.ledivan.com.br.pem".format(private_keys)))
-        print(r.text)
-    except json.decoder.JSONDecodeError as e:
-        print(e)
-
-def revoked_certs(hosts):
-    try:
-        headers = {"Content-Type": "text/pson"}
-        data = {"desired_state":"revoked"}
-        payload = json.dumps(data)
-        r = requests.put(f'https://master.ledivan.com.br:8140/puppet-ca/v1/certificate_status/{hosts}' \
-        ,data=payload,headers=headers,verify=False,cert=(f'{certs}master.ledivan.com.br.pem',"{}master.ledivan.com.br.pem".format(private_keys)))
-        r = requests.delete(f'https://master.ledivan.com.br:8140/puppet-ca/v1/certificate_status/{hosts}' \
-        ,data=payload,headers=headers,verify=False,cert=(f'{certs}master.ledivan.com.br.pem',"{}master.ledivan.com.br.pem".format(private_keys)))
-    except json.decoder.JSONDecodeError as e:
-        print(e)
+def run_task(nodes):
+     token = check_token()
+     headers={'Content-type': 'application/json', 'X-Authentication': token}
+     r = requests.post(f"https://10.0.0.10:4433/classifier-api/v2/classified/nodes/{nodes}",headers=headers,verify=False)
+     print("################################## Verificando o node:",nodes, "####################################")
+     for i in json.loads(r.text)["classes"]:
+          print(i)
 
 if __name__ == "__main__":
-    arg = str(sys.argv[1])
-    if arg == "delete":
-        puppetdb = puppet_db()
-        certificados = certificados_status()
-        for nodes in certificados:
-            if nodes not in puppetdb and nodes.startswith(os):
-                print("revoked_certs", nodes)
-                revoked_certs(nodes)
-    elif arg == "get":
-        print(certificados_status())
-    elif arg == "sign":
-        get_signed(sys.argv[2])
+    pre_task()
+    for i in lista:
+        run_task(i)
