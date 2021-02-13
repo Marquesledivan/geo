@@ -27,10 +27,7 @@ def login_api():
      with open("token.txt", "w") as f:
          f.write(token)
          f.close()
-     with open("token.txt", "r") as f:
-         return f.read()
-         f.close()
-
+ 
 def check_token():
     try:
         with open("token.txt", "r") as f:
