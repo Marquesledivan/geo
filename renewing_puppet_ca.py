@@ -41,7 +41,7 @@ openssl = """[ca]
 
 def renew_ca_puppet():
     date = today.strftime("%m-%d-%y")
-    sudo(f'cp -r /etc/puppetlabs/puppet/ssl /etc/puppetlabs/puppet/ssl-old-{date}')
+    sudo(f'cp -r /etc/puppetlabs/puppet/ssl /etc/puppetlabs/puppet/ssl-bkp-{date}')
     with open("/etc/puppetlabs/puppet/ssl/openssl.cnf", "w") as f:
         f.write(openssl)
         f.close()
