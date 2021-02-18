@@ -47,7 +47,6 @@ def renew_ca_puppet():
         f.close()
     sudo("""
     cd /etc/puppetlabs/puppet/ssl && \
-    rm -rfv certreq.csr index.txt* newcerts serial.old && \
     mkdir -p newcerts && touch index.txt && echo 00 > serial && \
     openssl x509 -x509toreq -in certs/ca.pem -signkey ca/ca_key.pem -out certreq.csr && \
     openssl ca -in certreq.csr -keyfile ca/ca_key.pem -days 3650 -out newcert.pem -config ./openssl.cnf &&\
