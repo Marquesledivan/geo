@@ -6,6 +6,8 @@ version 1.0 Author: Ledivan B. Marques
 """
 from os import system as sudo
 from datetime import date
+import shutil
+import os
 today = date.today()
 
 openssl = """[ca]
@@ -40,19 +42,27 @@ openssl = """[ca]
 """
 
 def renew_ca_puppet():
-    date = today.strftime("%m-%d-%Y")
-    sudo(f'cp -r /etc/puppetlabs/puppet/ssl /etc/puppetlabs/puppet/ssl-bkp-{date}')
-    with open("/etc/puppetlabs/puppet/ssl/openssl.cnf", "w") as f:
-        f.write(openssl)
-        f.close()
+    path = "/etc/puppetlabs/puppet/ssl"
+    date = today.strftime("%d-%m-%Y")
+    if not os.path.exists(f'{path}-bkp-{date}'):
+        shutil.copytree(f'{path}',f'{path}-bkp-{date}')
+    with open(f"{path}/openssl.cnf", "w") as f:
+      f.write(openssl)
+      f.close()
+    with open(f"{path}/index.txt", 'a') as f:
+      f.close()
+    if not os.path.exists(f'{path}/newcerts'):
+          os.makedirs(f'{path}/newcerts')
+    with open(f'{path}/serial', "a") as f:
+      f.write("00")
+      f.close()
     sudo("""
-    cd /etc/puppetlabs/puppet/ssl && \
-    mkdir -p newcerts && touch index.txt && echo 00 > serial && \
+    cd """+path+""" && \
     openssl x509 -x509toreq -in certs/ca.pem -signkey ca/ca_key.pem -out certreq.csr && \
     openssl ca -in certreq.csr -keyfile ca/ca_key.pem -days 3650 -out newcert.pem -config ./openssl.cnf &&\
-    cp -r /etc/puppetlabs/puppet/ssl/ca/ca_crt.pem{,.bak} && \
+    cp -r """+path+"""/ca/ca_crt.pem{,.bak} && \
     cp newcert.pem ca/ca_crt.pem && \
-    rm /etc/puppetlabs/puppet/ssl/certs/ca.pem && \
+    rm """+path+"""/certs/ca.pem && \
     rm -rfv certreq.csr index.txt* newcert* serial.old && \
     puppet agent -t
     """)
