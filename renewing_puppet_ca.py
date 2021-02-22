@@ -44,6 +44,7 @@ openssl = """[ca]
 def renew_ca_puppet():
     path = "/etc/puppetlabs/puppet/ssl"
     date = today.strftime("%d-%m-%Y")
+    days = "3650"
     if not os.path.exists(f'{path}-bkp-{date}'):
         shutil.copytree(f'{path}',f'{path}-bkp-{date}')
     with open(f"{path}/openssl.cnf", "w") as f:
@@ -59,7 +60,7 @@ def renew_ca_puppet():
     sudo("""
     cd """+path+""" && \
     openssl x509 -x509toreq -in certs/ca.pem -signkey ca/ca_key.pem -out certreq.csr && \
-    openssl ca -in certreq.csr -keyfile ca/ca_key.pem -days 3650 -out newcert.pem -config ./openssl.cnf &&\
+    openssl ca -in certreq.csr -keyfile ca/ca_key.pem -days """+ days +""" -out newcert.pem -config ./openssl.cnf &&\
     cp -r """+path+"""/ca/ca_crt.pem{,.bak} && \
     cp newcert.pem ca/ca_crt.pem && \
     rm """+path+"""/certs/ca.pem && \
