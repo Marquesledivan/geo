@@ -8,21 +8,42 @@ version 1.0 Author: Ledivan B. Marques
 
 import requests
 import pprint
+import json
+import os
 import requests.packages.urllib3
 requests.packages.urllib3.disable_warnings()
 
+# def login():
+#         token = {}
+#         headers = {'content-type': 'application/json',}
+#         params = (('action', 'login'),)
+#         data = '{"username":"admin","password":"123"}'
+#         response = requests.post('https://rancher.my.org/v3-public/localProviders/local', headers=headers, params=params, data=data, verify=False)
+#         token["token"] = response.json()["token"]
+#         token["name"] = response.json()["name"]
+#         return token
+
+login_token = os.environ["token_api"]
 
 def login():
         token = {}
-        headers = {'content-type': 'application/json',}
-        params = (('action', 'login'),)
-        data = '{"username":"","password":""}'
-        response = requests.post('https://rancher.my.org/v3-public/localProviders/local', headers=headers, params=params, data=data, verify=False)
+        description = "Deploy"
+        cookies = {
+                'R_SESS': login_token,
+        }
+        headers = {
+                'x-api-no-challenge': 'true',
+                'accept': 'application/json',
+                'x-api-action-links': 'actionLinks',
+                'content-type': 'application/json',
+        }
+        data = {"type":"token","description":description}
+        payload = json.dumps(data)
+        response = requests.post('https://172.16.16.101/v3/token', headers=headers, cookies=cookies, data=payload, verify=False)
         token["token"] = response.json()["token"]
         token["name"] = response.json()["name"]
         return token
 
-login_token = ""
 token = login()
 token_api = token["token"]
 name = token["name"]
