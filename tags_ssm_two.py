@@ -20,7 +20,6 @@ def region_get(regions):
 
     for page in paginator['Parameters']:
         response = client.get_parameter(Name=page['Name'])
-        value = response['Parameter']['Value']
         lista.append(page['Name'])
 
 def get_tags(name,regions):
