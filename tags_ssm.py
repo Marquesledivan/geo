@@ -12,7 +12,7 @@ response = client.get_paginator('describe_parameters')
 paginator = response.paginate().build_full_result()
 
 lista = []
-dirs = {'Key': "string", "Value": "string"}
+tgs_name = {'Key': "string", "Value": "string"}
 for page in paginator['Parameters']:
     response = client.get_parameter(Name=page['Name'])
     value = response['Parameter']['Value']
@@ -28,7 +28,7 @@ def get_tags(name):
         if "string" in r["Key"]:
             tag = {'Key': string, "Value": r["Value"]}
             return tag
-    return dirs
+    return tgs_name
 
 def set_tags(tgs,name):
     tags = client.list_tags_for_resource(
