@@ -13,6 +13,7 @@ lista = []
 tgs_name = {'Key': "string", "Value": "string"}
 
 def region_get(regions):
+    lista.clear()
     client = boto3.client("ssm",region_name=regions)
     response = client.get_paginator('describe_parameters')
     paginator = response.paginate().build_full_result()
