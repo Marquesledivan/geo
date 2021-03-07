@@ -18,27 +18,30 @@ for page in paginator['Parameters']:
     value = response['Parameter']['Value']
     lista.append(page['Name'])
 
-def set_tags():
+def get_tags(name):
     string = "string"
-    TGS = {}
-    for i in lista:
-        tags = client.list_tags_for_resource(
-            ResourceType='Parameter',
-            ResourceId=i
-        )
-        try:
-            for r in tags['TagList']:
-                if "string" in r["Key"]:
-                    TGS.update({'Key': "string", "Value": r["Value"]})
-                    break
-                else:
-                    TGS.update(dirs)
-                    break
-            if TGS not in tags['TagList']:
-                print(i)
-                client.add_tags_to_resource(ResourceType='Parameter',ResourceId=i,Tags=[TGS])
-        except botocore.exceptions.ParamValidationError:
-            print(i)
-            client.add_tags_to_resource(ResourceType='Parameter',ResourceId=i,Tags=[dirs])
+    tags = client.list_tags_for_resource(
+        ResourceType='Parameter',
+        ResourceId=name
+    )
+    for r in tags['TagList']:
+        if "string" in r["Key"]:
+            tag = {'Key': string, "Value": r["Value"]}
+            return tag
+    return dirs
 
-set_tags()
+def set_tags(tgs,name):
+    tags = client.list_tags_for_resource(
+        ResourceType='Parameter',
+        ResourceId=name
+    )
+    try:
+        if tgs not in tags['TagList']:
+            print(name,tgs)
+            client.add_tags_to_resource(ResourceType='Parameter',ResourceId=name,Tags=[tgs])
+    except botocore.exceptions.ParamValidationError:
+        print(name,tgs)
+        client.add_tags_to_resource(ResourceType='Parameter',ResourceId=name,Tags=[tgs])
+
+for parameter in lista:
+    set_tags(get_tags(parameter),parameter)
