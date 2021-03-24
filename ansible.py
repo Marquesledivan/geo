@@ -16,10 +16,10 @@ cat inventory
 [defaults]
 ansible_python_interpreter=/usr/bin/python3
 inventory = /Users/ledivan/temp/inventory
-vault_password_file = ~/.ansible/vault/password.txt
+##vault_password_file = ~/.ansible/vault/password.txt
 remote_user = ledivan
 ##ask_sudo_pass = True
-##ask_pass      = True
+ask_pass      = True
 deprecation_warnings = False
 command_warnings = False
 host_key_checking = False
