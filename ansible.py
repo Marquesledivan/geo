@@ -32,3 +32,29 @@ become_ask_pass=False
 
 # ansible.builtin.service
 ansible linux -m service -a "name=httpd state=restarted"  -K
+
+# main.yml
+
+###### Restart Service ########
+---
+- name: Restart agent
+  hosts: all
+  become: yes
+  tasks:
+###### Copy CA ######
+  - name: Copy CA
+    copy:
+      src: hots
+      dest: /root/
+      owner: ledivan
+      group: ledivan
+      mode: '0644'
+###### Restart agent ######
+  - name: Restart agent
+    service:
+      name: httpd
+      enabled: true
+      state: restarted
+
+# ansible-playbook
+ansible-playbook -i inventory main.yml -K
