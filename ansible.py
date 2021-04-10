@@ -5,6 +5,8 @@ lsof -t /var/log/httpd/access_log
 lsof -i 4 -a  -p 1633
 lsof /var/log | grep -i "deleted"
 
+fuser -k /dev/pts/0
+
 
 # ansible.builtin.shell
 ansible linux -i inventory -m shell -a 'systemctl start httpd' -u ledivan --ask-pass -b -K
