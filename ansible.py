@@ -7,6 +7,21 @@ lsof /var/log | grep -i "deleted"
 
 fuser -k /dev/pts/0
 
+ipcs -s | -wc -l 
+cat /proc/sys/kernel/msgmni
+cat /proc/sys/kernel/sem
+ipcs -s | awk -v user=apache '$3==user {system("ipcrm -s "$2)}'
+ipcrm -a
+
+
+https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/5/html/tuning_and_optimizing_red_hat_enterprise_linux_for_oracle_9i_and_10g_databases/sect-oracle_9i_and_10g_tuning_guide-setting_semaphores-setting_semaphore_parameters
+https://serverfault.com/questions/991946/no-space-left-on-device-ah00023-couldnt-create-the-mpm-accept-mutex-when-re
+
+ipcs -u
+ipcs -a
+ipcs -q
+ipcs -s
+ipcs -m -i 425984
 
 # ansible.builtin.shell
 ansible linux -i inventory -m shell -a 'systemctl start httpd' -u ledivan --ask-pass -b -K
