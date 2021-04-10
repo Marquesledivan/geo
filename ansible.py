@@ -1,3 +1,11 @@
+kill -9 `lsof -t  -u postfix`
+lsof -l -u postfix
+lsof +D /var/log/
+lsof -t /var/log/httpd/access_log
+lsof -i 4 -a  -p 1633
+lsof /var/log | grep -i "deleted"
+
+
 # ansible.builtin.shell
 ansible linux -i inventory -m shell -a 'systemctl start httpd' -u ledivan --ask-pass -b -K
 
