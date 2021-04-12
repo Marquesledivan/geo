@@ -45,8 +45,9 @@ def set_tags(get_tags,name,client):
 
 if __name__ == "__main__":
     for region in regions['Regions']:
-        print("Region: " + str(region['RegionName']))
-        client = boto3.client("ssm",region_name=region['RegionName'])
-        for parameter_name in parameter_by_region(client):
-            tags_owner = get_tags(parameter_name,client)
-            set_tags(tags_owner,parameter_name,client)
+        if region["RegionName"] in "us-east-1":
+            print("Region: " + str(region['RegionName']))
+            client = boto3.client("ssm",region_name=region['RegionName'])
+            for parameter_name in parameter_by_region(client):
+                tags_owner = get_tags(parameter_name,client)
+                set_tags(tags_owner,parameter_name,client)
