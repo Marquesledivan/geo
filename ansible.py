@@ -13,6 +13,12 @@ cat /proc/sys/kernel/sem
 ipcs -s | awk -v user=apache '$3==user {system("ipcrm -s "$2)}'
 ipcrm -a
 
+#### LVM
+dmsetup info /dev/dm-0
+lvdisplay|awk  '/LV Name/{n=$3} /Block device/{d=$3; sub(".*:","dm-",d); print d,n;}'
+lsblk --output NAME,KNAME,TYPE,SIZE,MOUNTPOINT
+iostat -x -d 1
+
 
 https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/5/html/tuning_and_optimizing_red_hat_enterprise_linux_for_oracle_9i_and_10g_databases/sect-oracle_9i_and_10g_tuning_guide-setting_semaphores-setting_semaphore_parameters
 https://serverfault.com/questions/991946/no-space-left-on-device-ah00023-couldnt-create-the-mpm-accept-mutex-when-re
