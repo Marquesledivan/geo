@@ -1,3 +1,14 @@
+### Import Key Pair to Java Keystore
+
+cat myhost.pem intermediate.pem root.pem > import.pem
+openssl pkcs12 -export -in import.pem -inkey myhost.key.pem -name shared > server.p12
+keytool -importkeystore -srckeystore server.p12 -destkeystore store.keys -srcstoretype pkcs12 -alias shared
+
+### Delete a certificate from a keystore with keytool
+keytool -list -v -keystore keystoreCopy.jks
+keytool -delete -alias aliasARetirer -keystore copieKeystore.jks
+
+
 kill -9 `lsof -t  -u postfix`
 lsof -l -u postfix
 lsof +D /var/log/
