@@ -8,6 +8,10 @@ keytool -importkeystore -srckeystore server.p12 -destkeystore store.keys -srcsto
 keytool -list -v -keystore keystoreCopy.jks
 keytool -delete -alias aliasARetirer -keystore copieKeystore.jks
 
+## Import the Certificate as a Trusted Certificate
+keytool -import -alias susan -file Example.cer -keystore exampleraystore
+keytool -printcert -file Example.cer
+
 
 kill -9 `lsof -t  -u postfix`
 lsof -l -u postfix
