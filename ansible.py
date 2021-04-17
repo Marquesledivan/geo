@@ -13,6 +13,7 @@ keytool -import -alias susan -file Example.cer -keystore exampleraystore
 keytool -printcert -file Example.cer
 
 ###How do I view the details of a digital certificate .cer
+openssl x509 -in certificate.crt -text -noout
 openssl x509 -in localhost.localdomain.pem -noout -text
 openssl x509 -inform pem -in cerfile.cer -noout -text
 openssl x509 -inform der -in cerfile.cer -noout -text
