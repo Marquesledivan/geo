@@ -1,3 +1,8 @@
+https://howto.lintel.in/listen-arbitrary-port-print-data-coming-using-netcat/
+  
+nc -lv 443
+nc localhost 443
+
 ### Import Key Pair to Java Keystore
 
 cat myhost.pem intermediate.pem root.pem > import.pem
