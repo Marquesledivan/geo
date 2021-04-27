@@ -1,6 +1,13 @@
+# https://vim.fandom.com/wiki/Indenting_source_code
+# python.vim
+filetype plugin indent on
+
+setlocal expandtab
+setlocal shiftwidth=4
+setlocal softtabstop=4
+
+
 ### repo: https://access.redhat.com/solutions/23016
-  
-  
 
 https://howto.lintel.in/listen-arbitrary-port-print-data-coming-using-netcat/
   
