@@ -5,6 +5,8 @@ screen -ls
 screen -r 10835
 screen -R
 
+screen -S 2041 -X quit
+  
 ### You can detach from the screen session at any time by typing:
 Ctrl+a d
 
