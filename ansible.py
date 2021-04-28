@@ -77,6 +77,29 @@ ipcs -q
 ipcs -s
 ipcs -m -i 425984
 
+
+************************************************************************************************
+Ativando o Encaminhamento (ip_forward)
+
+vim /proc/sys/net/ipv4/ip_forward
+
+se ele estiver em uso
+
+echo "1" > /proc/sys/net/ipv4/ip_forward
+
+************************************************************************************************
+
+Mascaramento dos pacotes
+
+iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+
+Ver roteamento
+
+
+iptables -t nat -L
+
+************************************************************************************************
+
 # ansible.builtin.shell
 ansible linux -i inventory -m shell -a 'systemctl start httpd' -u ledivan --ask-pass -b -K
 
