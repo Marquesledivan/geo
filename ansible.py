@@ -1,3 +1,15 @@
+## https://linuxize.com/post/how-to-use-linux-screen/
+
+screen -S session_name
+screen -ls
+screen -r 10835
+screen -R
+
+### You can detach from the screen session at any time by typing:
+Ctrl+a d
+
+************************************************************************************************
+
 # https://vim.fandom.com/wiki/Indenting_source_code
 # python.vim
 filetype plugin indent on
@@ -13,6 +25,8 @@ setlocal softtabstop=4
 :.,$!sort
 
 :w !sudo tee % > /dev/null
+
+************************************************************************************************
 
 ### repo: https://access.redhat.com/solutions/23016
 
@@ -45,6 +59,7 @@ openssl x509 -in localhost.localdomain.pem -noout -text
 openssl x509 -inform pem -in cerfile.cer -noout -text
 openssl x509 -inform der -in cerfile.cer -noout -text
 
+************************************************************************************************
 
 kill -9 `lsof -t  -u postfix`
 lsof -l -u postfix
