@@ -6,6 +6,13 @@ setlocal expandtab
 setlocal shiftwidth=4
 setlocal softtabstop=4
 
+:set visualbell
+:set ic
+:set tabstop=4                                                                                                                                                  1,1           All
+:set showmatch
+:.,$!sort
+
+:w !sudo tee % > /dev/null
 
 ### repo: https://access.redhat.com/solutions/23016
 
