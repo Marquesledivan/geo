@@ -1,3 +1,10 @@
+# 
+tmux new -s ledivan
+tmux ls
+tmux kill-session -t  ledivan
+tmux attach -t ledivan
+tmux detach
+************************************************************************************************
 ## https://linuxize.com/post/how-to-use-linux-screen/
 
 screen -S session_name
