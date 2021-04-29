@@ -17,6 +17,10 @@ screen -S 2041 -X quit
 ### You can detach from the screen session at any time by typing:
 Ctrl+a d
 
+
+screen -d -m -S shared
+creen -x shared
+
 ************************************************************************************************
 
 # https://vim.fandom.com/wiki/Indenting_source_code
