@@ -1,4 +1,15 @@
-# 
+https://aws.amazon.com/pt/premiumsupport/knowledge-center/lambda-function-assume-iam-role/
+
+{
+    "Version": "2012-10-17",
+    "Statement": {
+        "Effect": "Allow",
+        "Action": "sts:AssumeRole",
+        "Resource": "arn:aws:iam::084069002261:role/ledivan_devops"
+    }
+}
+
+## 
 tmux new -s ledivan
 tmux ls
 tmux kill-session -t  ledivan
