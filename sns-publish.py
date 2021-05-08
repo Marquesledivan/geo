@@ -14,7 +14,7 @@ response = client.publish(
 if response["ResponseMetadata"]["HTTPStatusCode"] == 200:
      print('Sucesso!!!')
  
-
+## https://www.shogan.co.uk/aws/aws-sns-to-lambda-cross-account-setup/
 ## aws sns publish --topic-arn "arn:aws:sns:us-east-1:434842609133:ledivan_teste" --message '{ "Key": "BOB", "Value": "BOB" }'
 ##############################################################################################################################
 
