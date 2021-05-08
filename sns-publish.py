@@ -13,11 +13,28 @@ response = client.publish(
 
 if response["ResponseMetadata"]["HTTPStatusCode"] == 200:
      print('Sucesso!!!')
- 
+##############################################################################################################################
 ## https://www.shogan.co.uk/aws/aws-sns-to-lambda-cross-account-setup/
+## https://www.fourco.nl/blogs/using-lambda-and-awsprincipalorgid-to-centrally-manage-aws-cloudwatch-alarms-at-scale/
 ## aws sns publish --topic-arn "arn:aws:sns:us-east-1:434842609133:ledivan_teste" --message '{ "Key": "BOB", "Value": "BOB" }'
 ##############################################################################################################################
+{
+    "Effect": "Allow",
+    "Principal": "*",
+    "Action": [
+        "sns:Publish"
+    ],
+    "Resource": "arn:aws:sns:us-east-1:12345678:ledivan_teste",
+    "Condition": {
+        "StringEquals": {
+            "aws:PrincipalOrgID": [
+                ""
+            ]
+        }
+    }
+}
 
+##############################################################################################################################
 #!/usr/local/bin/python3
 """
 version 1.0 Author: Ledivan B. Marques
