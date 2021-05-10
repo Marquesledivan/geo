@@ -5,7 +5,7 @@ message = { "Key": "Ledivan", "Value": "Bernardo" }
 client = boto3.client('sns')
 
 response = client.publish(
-    TopicArn='arn:aws:sns:us-east-1:434842609133:ledivan_teste',
+    TopicArn='arn:aws:sns:us-east-1:33348426033333:ledivan_teste',
     Message=json.dumps(message),
     Subject='teste',
 )
