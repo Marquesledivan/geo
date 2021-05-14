@@ -9,3 +9,14 @@ def revoked_certs(hosts):
         ,data=payload,headers=headers,verify=False,cert=(f'{certs}master.ledivan.com.br.pem',"{}master.ledivan.com.br.pem".format(private_keys)))
     except json.decoder.JSONDecodeError as e:
         print(e)
+
+def get_signed(hosts):
+    try:
+        headers = {'Content-type': 'application/json'}
+        data = {"desired_state":"signed"}
+        payload = json.dumps(data)
+        r = requests.put(f'https://master.ledivan.com.br:8140/puppet-ca/v1/certificate_status/{hosts}' \
+        ,data=payload,headers=headers,verify=False,cert=(f'{certs}master.ledivan.com.br.pem',"{}master.ledivan.com.br.pem".format(private_keys)))
+        print(r.text)
+    except json.decoder.JSONDecodeError as e:
+        print(e)
