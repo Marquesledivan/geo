@@ -1,13 +1,9 @@
-https://aws.amazon.com/pt/premiumsupport/knowledge-center/lambda-function-assume-iam-role/
+#####
+mount -t tmpfs -o size=5G,nr_inodes=5k,mode=700 tmpfs /tmp
 
-{
-    "Version": "2012-10-17",
-    "Statement": {
-        "Effect": "Allow",
-        "Action": "sts:AssumeRole",
-        "Resource": "arn:aws:iam::084069002261:role/ledivan_devops"
-    }
-}
+mount -t tmpfs shmfs -o size=12g /dev/shm
+
+mount -t tmpfs shmfs -o size=12g /dev/shm
 
 ## 
 tmux new -s ledivan
