@@ -134,6 +134,24 @@ Ver roteamento
 iptables -t nat -L
 
 ************************************************************************************************
+---
+- name: update web servers
+  hosts: localhost
+  tasks:
+  - name: Mount Tmpfs
+    mount:
+        name: /tmp
+        src: tmpfs
+        path: /tmp
+        fstype: tmpfs
+        opts: size=8g,ro,noauto
+        state: "{{ item }}"
+    loop:
+     - mounted
+     - present
+
+************************************************************************************************
+
 
 # ansible.builtin.shell
 ansible linux -i inventory -m shell -a 'systemctl start httpd' -u ledivan --ask-pass -b -K
