@@ -1,0 +1,14 @@
+{# style 1 - long form #}
+{% if filepath == '/var/opt/tomcat_1' %}
+  {% set tomcat_value = tomcat_1_value %}
+{% else %}
+  {% set tomcat_value = tomcat_2_value %}
+{% endif %}
+
+{# style 2 - short form #}
+{% set tomcat_value = tomcat_1_value if (filepath == '/var/opt/tomcat_1') else tomcat_2_value %}
+
+{# style 3 - with ternary filter #}
+{% set tomcat_value = (filepath == '/var/opt/tomcat_1')|ternary(tomcat_1_value, tomcat_2_value) %}
+
+<Server port={{ tomcat_value }} shutdown="SHUTDOWN">
