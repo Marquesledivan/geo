@@ -138,18 +138,22 @@ iptables -t nat -L
 - name: update web servers
   hosts: localhost
   tasks:
+  - name: This command will change the working directory
+    ansible.builtin.shell:  grep "/tmp" /proc/mounts
+    register: result
+    failed_when: result.rc == 2
+    changed_when: false
+
+  - debug:
+      msg: "{{ 'tmpfs' if result.rc == 1 else result.stdout.split(' ')[3] }}"
+
   - name: Mount Tmpfs
     mount:
-        name: /tmp
-        src: tmpfs
-        path: /tmp
-        fstype: tmpfs
-        opts: size=8g,ro,noauto
-        state: "{{ item }}"
-    loop:
-     - mounted
-     - present
-
+      src: "{{ 'tmpfs' if result.rc == 1  else result.stdout.split(' ')[0] }}"
+      path: /tmp
+      fstype: "{{ 'tmpfs' if result.rc == 1 else result.stdout.split(' ')[2] }}"
+      opts: "{{ 'rw,relatime,size=8g' if result.rc == 1 or result.stdout.split(' ')[0] == 'tmpfs' else 'ro,relatime,size=8g' }}"
+      state: mounted
 ************************************************************************************************
 
 
