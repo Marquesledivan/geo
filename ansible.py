@@ -152,7 +152,7 @@ iptables -t nat -L
       src: "{{ 'tmpfs' if result.rc == 1  else result.stdout.split(' ')[0] }}"
       path: /tmp
       fstype: "{{ 'tmpfs' if result.rc == 1 else result.stdout.split(' ')[2] }}"
-      opts: "{{ 'rw,relatime,size=8g' if result.rc == 1 or result.stdout.split(' ')[0] == 'tmpfs' else 'ro,relatime,size=8g' }}"
+      opts: "{{ 'rw,nosuid,nodev,noexec,relatime,size=8g' if result.rc == 1 or result.stdout.split(' ')[0] == 'tmpfs' else 'rw,nosuid,nodev,noexec,relatime,attr2,inode64,noquota' }}"
       state: mounted
 ************************************************************************************************
 
