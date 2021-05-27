@@ -1,0 +1,16 @@
+---
+- hosts: foo
+  vars:
+    tomcat_1_value: 'bob'
+    tomcat_2_value: 'bar'
+  tasks:
+    # style 1 using filter
+    - set_fact:
+        tomcat_value: "{{ (filepath == '/var/opt/tomcat_1') | ternary(tomcat_1_value, tomcat_2_value) }}"
+    # style 2
+    - set_fact:
+        tomcat_value: "{{ tomcat_1_value if (filepath == '/var/opt/tomcat_1') else tomcat_2_value }}"
+
+
+    - template:
+        ...
