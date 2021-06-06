@@ -56,9 +56,6 @@ def send_email(url):
       with open("demofile.txt", "r") as read:
             bodys = read.read()
       sent_from = gmail_user
-      with open('download.jpeg', 'rb') as img:
-            image = MIMEImage(img.read())
-      image.add_header('Content-ID', '<myimage>')
       try:
             message.attach(MIMEText(bodys, "html"))
             server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
