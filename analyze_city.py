@@ -5,50 +5,59 @@ version 1.0 Author: Ledivan B. Marques
             Email:	ledivan_bernardo@yahoo.com.br
 """
 import csv
+import requests
 from urllib import request
 import os
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.image import MIMEImage
+import sys
+
+city =  sys.argv[1]
 
 url_ibge = r"http://blog.mds.gov.br/redesuas/wp-content/uploads/2018/06/Lista_Munic%C3%ADpios_com_IBGE_Brasil_Versao_CSV.csv"
-html_ = """
+html = f"""
 <html>
 <body>
 <img src="https://upload.wikimedia.org/wikipedia/commons/b/b3/Rua_do_Conjunto_Arquitet%C3%B4nico_da_Cidade_de_Goi%C3%A1s%2C_Goi%C3%A1s%2C_Brasil.jpg" width="522" height="346">
 </body>
 </html>
-<html> <body> <p>Hi,<br> Check out the new post on the Mailtrap blog:</p> <p><a href="https://blog.mailtrap.io/2018/09/27/cloud-or-local-smtp-server">SMTP Server for Testing: Cloud-based or Local?</a></p> <p> Feel free to <strong>let us</strong> know what content would be useful for you!</p> </body> </html> <pre>
+<html> <body> <p>Hi,<br>Check out the new post on the api city blog:</p> <p><a href="https://servicodados.ibge.gov.br/api/v1/localidades/estados/{city.upper()}">Test API: Cloud-based or City API!!</a></p> <p> Feel free to <strong>let us</strong> know what content would be useful for you!</p> </body> </html> <pre>
 """
 
+def states(sigla):
+      response = requests.get("https://servicodados.ibge.gov.br/api/v1/localidades/estados")
+      for siglas in response.json():
+            if sigla in siglas["sigla"]:
+                  return siglas["nome"]
 def get(url):
       count = 0
       list_cidades = []
+      sigla_city = states(city.upper())
       if os.path.exists("demofile.txt"):
             os.remove("demofile.txt")
       f = open("demofile.txt", "a")
-      f.write(html_)
-      f.write("""<p style="font-size:30px">Goiás</p>""")
+      f.write(html)
+      f.write("""<p style="font-size:30px">"""+sigla_city +"""</p>""")
       with request.urlopen(url) as entrada:
         print("Downloading data for analysis")
         dados = entrada.read().decode('latin-1')
         for cidade in csv.reader(dados.splitlines(True)):
               sigla = f'{cidade[0]}'
               ci_sigla = sigla.split(";")
-              if "GO" in  ci_sigla:
+              if city.upper() in  ci_sigla:
                     f = open("demofile.txt", "a")
                     f.write('\n'+ci_sigla[0][2:])
                     f.close()
-                    list_cidades.append(ci_sigla[0][2:])
-      return list_cidades
 
 def send_email(url):
       gmail_user = ''
       gmail_password = ''
       to = ''
       message = MIMEMultipart("alternative")
-      message["Subject"] = "State Goiás"
+      sigla_city = states(city.upper())
+      message["Subject"] = f'State {sigla_city}'
       message["From"] = gmail_user
       message["To"] = to
 
@@ -69,5 +78,4 @@ def send_email(url):
             print("Failed to send email")
 
 if __name__ == "__main__":
-      print("Starting analysis")
       send_email(url_ibge)
