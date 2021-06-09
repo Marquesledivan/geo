@@ -75,23 +75,34 @@ def send_email(sigla_city):
             server.sendmail(sent_from, to,message.as_string())
             server.close()
 
-            print("Email sent!")
+            return "Email sent!"
       except:
-            print("Failed to send email")
+            return "Failed to send email"
 
 @app.route('/state', methods=['POST'])
 def state_city():
       try:
             content = request.get_json()
-            send_email(content["state"])
-            return 'Email sent!'
+            return send_email(content["state"])
       except:
-            return 'Failed to send email'
+            return 'Call Failed'
 
 if __name__ == '__main__':
     app.run(debug=True)
 
-##### curl --location --request POST 'http://127.0.0.1:5000/state' \
-## --header 'Content-Type: application/json' \
-## --data-raw '{ "state": "sp" }
-'
+## call api
+
+import requests
+import json
+url = "http://127.0.0.1:5000/state"
+
+dados={ "state": "go" }
+payload = json.dumps(dados)
+headers = {
+  'Content-Type': 'application/json'
+}
+
+response = requests.request("POST", url, headers=headers, data=payload)
+
+print(response.text)
+
