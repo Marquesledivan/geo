@@ -90,3 +90,8 @@ def state_city():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+##### curl --location --request POST 'http://127.0.0.1:5000/state' \
+## --header 'Content-Type: application/json' \
+## --data-raw '{ "state": "sp" }
+'
