@@ -1,4 +1,8 @@
 #####
+
+grep -oE "ssl-cert\\S*postgres" /etc/group
+
+#####
 mount -t tmpfs -o size=5G,nr_inodes=5k,mode=700 tmpfs /tmp
 
 mount -t tmpfs shmfs -o size=12g /dev/shm
