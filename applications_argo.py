@@ -1,3 +1,8 @@
+# kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+# argocd app create ledivan-helm --repo git@github.com:Marquesledivan/nginx_k8s.git --path ledivan-app --dest-namespace ledivan --dest-server https://kubernetes.default.svc --helm-set replicaCount=2
+# argocd app sync ledivan-helm
+# argocd repo add git@github.com:Marquesledivan/nginx_k8s.git --insecure-ignore-host-key --ssh-private-key-path ~/.ssh/id_rsa
+# 
 import requests
 import json
 import pprint
