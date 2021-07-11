@@ -2,6 +2,7 @@
 # argocd app create ledivan-helm --repo git@github.com:Marquesledivan/nginx_k8s.git --path ledivan-app --dest-namespace ledivan --dest-server https://kubernetes.default.svc --helm-set replicaCount=2
 # argocd app sync ledivan-helm
 # argocd repo add git@github.com:Marquesledivan/nginx_k8s.git --insecure-ignore-host-key --ssh-private-key-path ~/.ssh/id_rsa
+# https://argoproj.github.io/argo-cd/getting_started/
 import requests
 import json
 import pprint
@@ -102,5 +103,285 @@ def applications():
     payload = json.dumps(data)
     response = requests.post('https://127.0.0.1:8080/api/v1/applications', headers=headers, cookies=cookies, data=payload, verify=False)
     print(response.json())
+def set_image():
+    cookies = { 'argocd.token': f"{ARGOCD_TOKEN}" }
 
-applications()
+    headers = {
+        'Connection': 'keep-alive',
+        'Content-Type': 'application/json',
+
+    }
+
+    data ={
+    "metadata": {
+        "name": "nginx",
+        "namespace": "argocd",
+        "resourceVersion": "6390",
+        "generation": 58,
+        "managedFields": [
+        {
+            "manager": "argocd-server",
+            "operation": "Update",
+            "apiVersion": "argoproj.io/v1alpha1",
+            "time": "2021-07-11T21:33:06Z",
+            "fieldsType": "FieldsV1",
+        },
+        {
+            "manager": "argocd-application-controller",
+            "operation": "Update",
+            "apiVersion": "argoproj.io/v1alpha1",
+            "fieldsType": "FieldsV1",
+        }
+        ]
+    },
+    "spec": {
+        "source": {
+        "repoURL": "git@github.com:Marquesledivan/nginx_k8s.git",
+        "path": "ledivan-app",
+        "targetRevision": "HEAD",
+        "helm": {
+            "parameters": [
+            {
+                "name": "image.tag",
+                "value": "1.20.0"
+            }
+            ]
+        }
+        },
+        "destination": {
+        "server": "https://kubernetes.default.svc",
+        "namespace": "teste"
+        },
+        "project": "default",
+        "syncPolicy": {
+        "automated": {
+            "prune": True,
+            "selfHeal": True
+        },
+        "syncOptions": [
+            "Validate=false",
+            "ApplyOutOfSyncOnly=true",
+            "CreateNamespace=true"
+        ]
+        }
+    },
+    "status": {
+        "resources": [
+        {
+            "version": "v1",
+            "kind": "Service",
+            "namespace": "teste",
+            "name": "nginx-ledivan-app",
+            "status": "Synced",
+            "health": {
+            "status": "Healthy"
+            }
+        },
+        {
+            "version": "v1",
+            "kind": "ServiceAccount",
+            "namespace": "teste",
+            "name": "nginx",
+            "status": "Synced"
+        },
+        {
+            "group": "apps",
+            "version": "v1",
+            "kind": "Deployment",
+            "namespace": "teste",
+            "name": "nginx-ledivan-app",
+            "status": "Synced",
+            "health": {
+            "status": "Healthy"
+            }
+        }
+        ],
+        "sync": {
+        "status": "Synced",
+        "comparedTo": {
+            "source": {
+            "repoURL": "git@github.com:Marquesledivan/nginx_k8s.git",
+            "path": "ledivan-app",
+            "targetRevision": "HEAD",
+            "helm": {
+                "parameters": [
+                {
+                    "name": "image.tag",
+                    "value": "1.20.0"
+                }
+                ]
+            }
+            },
+            "destination": {
+            "server": "https://kubernetes.default.svc",
+            "namespace": "teste"
+            }
+        },
+        "revision": "cf19b85121a940a5ef7da2d3b31c165566d58e9c"
+        },
+        "health": {
+        "status": "Healthy"
+        },
+        "history": [
+        {
+            "revision": "cf19b85121a940a5ef7da2d3b31c165566d58e9c",
+            "deployedAt": "2021-07-11T21:14:35Z",
+            "id": 0,
+            "source": {
+            "repoURL": "git@github.com:Marquesledivan/nginx_k8s.git",
+            "path": "ledivan-app",
+            "targetRevision": "HEAD"
+            },
+            "deployStartedAt": "2021-07-11T21:14:26Z"
+        },
+        {
+            "revision": "cf19b85121a940a5ef7da2d3b31c165566d58e9c",
+            "deployedAt": "2021-07-11T21:15:35Z",
+            "id": 1,
+            "source": {
+            "repoURL": "git@github.com:Marquesledivan/nginx_k8s.git",
+            "path": "ledivan-app",
+            "targetRevision": "HEAD"
+            },
+            "deployStartedAt": "2021-07-11T21:15:34Z"
+        },
+        {
+            "revision": "cf19b85121a940a5ef7da2d3b31c165566d58e9c",
+            "deployedAt": "2021-07-11T21:18:06Z",
+            "id": 2,
+            "source": {
+            "repoURL": "git@github.com:Marquesledivan/nginx_k8s.git",
+            "path": "ledivan-app",
+            "targetRevision": "HEAD"
+            },
+            "deployStartedAt": "2021-07-11T21:18:06Z"
+        },
+        {
+            "revision": "cf19b85121a940a5ef7da2d3b31c165566d58e9c",
+            "deployedAt": "2021-07-11T21:20:44Z",
+            "id": 3,
+            "source": {
+            "repoURL": "git@github.com:Marquesledivan/nginx_k8s.git",
+            "path": "ledivan-app",
+            "targetRevision": "HEAD"
+            },
+            "deployStartedAt": "2021-07-11T21:20:44Z"
+        },
+        {
+            "revision": "cf19b85121a940a5ef7da2d3b31c165566d58e9c",
+            "deployedAt": "2021-07-11T21:28:21Z",
+            "id": 4,
+            "source": {
+            "repoURL": "git@github.com:Marquesledivan/nginx_k8s.git",
+            "path": "ledivan-app",
+            "targetRevision": "HEAD"
+            },
+            "deployStartedAt": "2021-07-11T21:28:21Z"
+        },
+        {
+            "revision": "cf19b85121a940a5ef7da2d3b31c165566d58e9c",
+            "deployedAt": "2021-07-11T21:28:36Z",
+            "id": 5,
+            "source": {
+            "repoURL": "git@github.com:Marquesledivan/nginx_k8s.git",
+            "path": "ledivan-app",
+            "targetRevision": "HEAD"
+            },
+            "deployStartedAt": "2021-07-11T21:28:35Z"
+        },
+        {
+            "revision": "cf19b85121a940a5ef7da2d3b31c165566d58e9c",
+            "deployedAt": "2021-07-11T21:29:13Z",
+            "id": 6,
+            "source": {
+            "repoURL": "git@github.com:Marquesledivan/nginx_k8s.git",
+            "path": "ledivan-app",
+            "targetRevision": "HEAD"
+            },
+            "deployStartedAt": "2021-07-11T21:29:12Z"
+        },
+        {
+            "revision": "cf19b85121a940a5ef7da2d3b31c165566d58e9c",
+            "deployedAt": "2021-07-11T21:33:15Z",
+            "id": 7,
+            "source": {
+            "repoURL": "git@github.com:Marquesledivan/nginx_k8s.git",
+            "path": "ledivan-app",
+            "targetRevision": "HEAD",
+            "helm": {
+                "parameters": [
+                {
+                    "name": "image.tag",
+                    "value": "1.20.0"
+                }
+                ]
+            }
+            },
+            "deployStartedAt": "2021-07-11T21:33:10Z"
+        }
+        ],
+        "reconciledAt": "2021-07-11T21:33:15Z",
+        "operationState": {
+        "operation": {
+            "sync": {
+            "revision": "cf19b85121a940a5ef7da2d3b31c165566d58e9c",
+            "prune": True,
+            "syncOptions": [
+                "Validate=false",
+                "ApplyOutOfSyncOnly=true",
+                "CreateNamespace=true"
+            ]
+            },
+            "initiatedBy": {
+            "automated": True
+            },
+            "retry": {
+            "limit": 5
+            }
+        },
+        "phase": "Succeeded",
+        "message": "successfully synced (all tasks run)",
+        "syncResult": {
+            "resources": [
+            {
+                "group": "apps",
+                "version": "v1",
+                "kind": "Deployment",
+                "namespace": "teste",
+                "name": "nginx-ledivan-app",
+                "status": "Synced",
+                "message": "deployment.apps/nginx-ledivan-app configured",
+                "hookPhase": "Running",
+                "syncPhase": "Sync"
+            }
+            ],
+            "revision": "cf19b85121a940a5ef7da2d3b31c165566d58e9c",
+            "source": {
+            "repoURL": "git@github.com:Marquesledivan/nginx_k8s.git",
+            "path": "ledivan-app",
+            "targetRevision": "HEAD",
+            "helm": {
+                "parameters": [
+                {
+                    "name": "image.tag",
+                    "value": "1.20.0"
+                }
+                ]
+            }
+            }
+        },
+        "startedAt": "2021-07-11T21:33:10Z",
+        "finishedAt": "2021-07-11T21:33:15Z"
+        },
+        "sourceType": "Helm",
+        "summary": {
+        "images": [
+            "nginx:1.20.0"
+        ]
+        }
+    }
+    }
+    payload = json.dumps(data)
+    response = requests.put('https://127.0.0.1:8080/api/v1/applications/nginx', headers=headers, cookies=cookies, data=payload, verify=False)
+    print(response.text)
+
