@@ -103,6 +103,28 @@ def applications():
     payload = json.dumps(data)
     response = requests.post('https://127.0.0.1:8080/api/v1/applications', headers=headers, cookies=cookies, data=payload, verify=False)
     print(response.json())
+
+def sync():
+    cookies = { 'argocd.token': f"{ARGOCD_TOKEN}" }
+    headers = {
+        'Connection': 'keep-alive',
+        'Content-Type': 'application/json',
+        'Origin': 'https://127.0.0.1:8080',
+    }
+    data = {
+    "revision":"HEAD",
+    "prune":False,
+    "dryRun":False,
+    "strategy":{"hook":{"force":False}},
+    "syncOptions":{"items":["Validate': 'false",
+    "ApplyOutOfSyncOnly=true",
+    "CreateNamespace=true"]}
+    }
+    payload = json.dumps(data)
+    response = requests.post('https://127.0.0.1:8080/api/v1/applications/nginx/sync', headers=headers, cookies=cookies, data=payload, verify=False)
+    print(response.status_code)
+    
+    
 def set_image():
     cookies = { 'argocd.token': f"{ARGOCD_TOKEN}" }
 
