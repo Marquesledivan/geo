@@ -1,0 +1,110 @@
+# AWS
+
+---
+
+## Resize de disco na AWS
+
+```sh
+df -h
+sudo xfs_growfs -d /data
+```
+
+ou
+
+```sh
+lsblk
+sudo growpart /dev/nvme0n1 1
+sudo xfs_growfs -d /
+df -h
+```
+
+## Expurgo logs journalctl
+
+```sh
+sudo journalctl --vacuum-time=2d
+```
+
+## SSH
+```sh
+ssh -i elk-prod.pem ec2-user@172.30.151.25
+```
+## Remover message logs
+
+```sh
+sudo rm /var/log/messages-*
+```
+
+---
+
+
+# ElasticSearch
+
+---
+
+## Limpar field data elasticsearch
+
+```sh
+curl -X POST \
+  http://elk-elasticsearch.prod.cvc.intra:9200/_cache/clear
+```
+
+---
+
+# Logstash Back
+
+---
+
+## Filtro para dropar mensagem
+
+Acessar maquinas logstash-back, alterar arquivo e incluir regra
+```sh
+sudo vi /etc/logstash/conf.d/pipeline.conf
+if [system] == "system_name" { drop { } }
+```
+
+Validar arquivo foi alterado
+```sh
+cat /etc/logstash/conf.d/pipeline.conf
+```
+
+Restart logstash
+```sh
+sudo systemctl restart logstash
+systemctl status logstash
+```
+
+---
+
+# Logstash Front
+
+---
+
+## Ver mensagens que estão chegando logstash
+```sh
+sudo tcpdump -i eth0 -n port 12201
+```
+
+---
+
+
+---
+
+# Telegram Bot
+
+---
+
+## Atualizar lista de dispositivos
+
+Adicionar código do dispositivo em: AWS-APM/ansible/roles/monitoring/defaults/main.yml
+
+```sh
+./elk-ansible.sh monitoring prod "vars,telegrambot"
+```
+
+Acessar máquina do monitoring
+
+```sh
+sudo systemctl restart elktelegrambot.service
+```
+
+---
