@@ -146,3 +146,35 @@ gpg --clearsing carta.txt
 Verificar assinatura de um arquivo GPG:
 
 gpg --verify carta.txt 
+
+##############
+
+To create gpg key. gpg --gen-key --homedir /etc/salt/gpgkeys
+
+export the public key, secret key, and secret subkey.
+
+gpg --homedir /etc/salt/gpgkeys --export test-key > pub.key
+gpg --homedir /etc/salt/gpgkeys --export-secret-keys test-key > sec.key
+gpg --homedir /etc/salt/gpgkeys --export-secret-subkeys test-key > sub.key
+Now import the keys using the following command.
+
+gpg --import pub.key
+gpg --import sec.key
+gpg --import sub.key
+Verify if the keys are imported.
+
+gpg --list-keys
+gpg --list-secret-keys
+Create a sample file.
+
+echo "hahaha" > a.txt
+
+Encrypt the file using the imported key
+
+gpg --encrypt --sign --armor -r test-key a.txt
+
+To decrypt the file, use the following command.
+
+gpg --decrypt a.txt.asc
+
+gpg --decrypt --pinentry-mode=loopback <file>
