@@ -1,0 +1,148 @@
+**************************Introdução ao GPG******************************
+
+> Introdução a criptografia;
+> Instalação do GNUPG;
+> Gerenciar chaves com GPG;
+> Encriptar e decriptar arquivos com GPG;
+> Gerenciar assinaturas com GPG.
+
+Criptografia:
+
+Criptografia é o estudo dos principios e técnicas pelas quais a informação pode ser transformada da sua forma original para outra ilegível, de forma que possa ser conhecida apenas por seu destinatário (detentor da "chave secreta"), o que a torna difícil de ser lida por alguém não autorizado.
+
+Texto Legível*********************OX4T67 9AMS7A4 Q72YS 
+
+Tipos de criptografia:
+
+Simétrica:
+
+> Simples e útil;
+> Cobre situações nas quais uma parte esteja envolvida;
+> A pessoa que encripta é a mesma que decripta.
+
+Assimétrica:
+
+> Proporciona privacidade e autenticidade;
+> Úteis na troca de e-mail;
+> Seu uso exige que cada um dos lados possua um par chaves.
+
+Instalação na Linux do GNUPG:
+
+apt-get install gnupg
+
+Verificar versão do GNUPG:
+
+gpg --version 
+
+chmod o+rw $(tty)
+GNUPG:
+
+1 - Para começar gere uma chave privada para trabalharmos com o gpg. Atenção as respostas em negrito (usuario suporte):
+
+$ gpg --gen-key
+
+Sua opção? 2
+
+What keysize do you want? (2048) 1024
+
+A chave é valida por? (0) 1y
+
+Is this correct? (y/N) y 
+
+Nome completo: Suporte Máquina Interna
+
+Endereço de correio eletrônico:
+suporte- maqinterna@dexter.com.br 
+Comentário: Usuário Máquina Interna 
+Muda (N)ome, (C)omentário, (E)ndereço ou (o)k/(S)air? O
+Você precisa de uma frase secreta para proteger sua chave. (Digite sua frase secreta)
+
+Execute em outro terminal, diversos comandos para conseguir gerar entropia suficiente.
+
+Gerenciamento de chaves:
+
+Exportar chave para arquivo:
+
+gpg --armor --output "chave_publica_ledivan.txt" --export "lpi"
+
+Envie o arquivo para a máquina Webserver Interno:
+
+scp chave_publica_ledivan.txt 10.0.1.104:/home/ledivan
+
+GNUPG:
+
+Instalação no CentOS:
+
+yum install gnupg
+
+
+Verificar versão do GNUPG:
+
+gpg --version 
+
+
+Importar chave de arquivo:
+
+gpg --import chave_publica_ledivan.txt
+
+
+Gerenciamento de chaves:
+
+Listar chaves importadas:
+
+$ gpg --list -keys 
+
+Editar chaves importadas:
+
+gpg --edit-key "chave_publica_ledivan.txt"
+
+
+Comando para definir o grau de confiança:
+gpg> trust 
+
+Sua decisão? 5 
+
+Do you really want to set this key to ultimate trust? (y/N) y
+
+GNUPG:
+
+Para começar gere uma chave privada para trabalharmos com o gpg. Atenção as respostas em negrito:
+
+gpg --gen-key
+Sua opção? 2 
+What keysize do you want? (2048) 1024
+A chave é valida por? (0) 1y
+Is this correct? (y/N) y 
+Nome completo: Adminidtrador Webserver Interno 
+
+
+GNUPG:
+Endereço de correio eletrônico: admin@dexter.com.br
+Comentário: Servidor Webserver Interno
+Muda (N)ome, (C)omentário, (E)ndereço ou (O)k/(S)air? O 
+Você precisa de uma frase secreta para proteger sua chave. (Digite sua frase secreta)
+
+Execute em outro terminal, diversos comandos para conseguir entropia suficiente.
+
+Encriptar arquivo "fstab" na maquina Webserver Interno:
+$ cp /etc/fstab . 
+$ gpg --recipient "Suporte Máquina Interna" --output "fstab.gpg"
+--encrypt "fstab"
+Envie o arquivo para a máquina Linux Interna:
+$ scp fstab.gpg suporte@192.168.200.10 :
+
+
+Decriptar arquivo "fstab.gpg" na máquina Linux Interna:
+
+$ gpg --decrypt-files fstab.gpg 
+
+
+Assinar um arquivo com GPG:
+
+echo "Assinatura com GPG" > carta.txt 
+
+gpg --clearsing carta.txt 
+
+Verificar assinatura de um arquivo GPG:
+
+gpg --verify carta.txt 
