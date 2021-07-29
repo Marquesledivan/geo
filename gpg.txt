@@ -1,3 +1,4 @@
+#### https://www.techrepublic.com/article/how-to-create-and-export-a-gpg-keypair-on-macos/
 **************************Introdução ao GPG******************************
 
 > Introdução a criptografia;
