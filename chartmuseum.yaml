@@ -1,0 +1,135 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: chartmuseum
+automountServiceAccountToken: true
+---
+# Source: chartmuseum/templates/secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-chartmuseum
+  labels:
+    helm.sh/chart: chartmuseum-3.1.0
+    app.kubernetes.io/name: chartmuseum
+    app.kubernetes.io/instance: app
+    app.kubernetes.io/version: "0.13.1"
+    app.kubernetes.io/managed-by: Helm
+type: Opaque
+data:
+---
+# Source: chartmuseum/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-chartmuseum
+  labels:
+    helm.sh/chart: chartmuseum-3.1.0
+    app.kubernetes.io/name: chartmuseum
+    app.kubernetes.io/instance: app
+    app.kubernetes.io/version: "0.13.1"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8080
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    app.kubernetes.io/name: chartmuseum
+    app.kubernetes.io/instance: app
+---
+# Source: chartmuseum/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-chartmuseum
+  labels:
+    helm.sh/chart: chartmuseum-3.1.0
+    app.kubernetes.io/name: chartmuseum
+    app.kubernetes.io/instance: app
+    app.kubernetes.io/version: "0.13.1"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: chartmuseum
+      app.kubernetes.io/instance: app
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 0
+    type: RollingUpdate
+  revisionHistoryLimit: 10
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: chartmuseum
+        app.kubernetes.io/instance: app
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/agent-inject-secret-awscreds: aws/creds/ledivan
+        vault.hashicorp.com/agent-inject-template-awscreds: |
+            {{ with secret "aws/creds/ledivan" -}}
+            export AWS_ACCESS_KEY_ID={{ .Data.access_key }}
+            export AWS_SECRET_ACCESS_KEY={{ .Data.secret_key }}
+            {{- end }}
+        vault.hashicorp.com/role: chartmuseum
+    spec:
+      securityContext:
+        fsGroup: 1000      
+      containers:
+      - name: chartmuseum
+        image: ghcr.io/helm/chartmuseum:v0.13.1
+        command:
+        - /bin/sh
+        - -c
+        - source /vault/secrets/awscreds && /chartmuseum --port=8080
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          {}
+        env:
+        - name: "CHART_POST_FORM_FIELD_NAME"
+          value: "chart"
+        - name: "DISABLE_METRICS"
+          value: "true"
+        - name: "LOG_JSON"
+          value: "true"
+        - name: "PROV_POST_FORM_FIELD_NAME"
+          value: "prov"
+        - name: "STORAGE"
+          value: "amazon"
+        - name: "STORAGE_AMAZON_BUCKET"
+          value: "chartmuseum-ledivan"
+        - name: "STORAGE_AMAZON_REGION"
+          value: "us-east-1"
+        args:
+        - --port=8080
+        ports:
+        - name: http
+          containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          failureThreshold: 3
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: http
+          failureThreshold: 3
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        volumeMounts:
+      serviceAccountName: chartmuseum
+      volumes:
+      - name: storage-volume
+        emptyDir: {}
