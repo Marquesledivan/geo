@@ -1,3 +1,4 @@
+# https://discuss.hashicorp.com/t/vault-injector-and-environment-variable-export/21708/2
 ---
 apiVersion: v1
 kind: ServiceAccount
