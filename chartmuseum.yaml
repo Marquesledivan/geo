@@ -1,4 +1,5 @@
 # https://discuss.hashicorp.com/t/vault-injector-and-environment-variable-export/21708/2
+# https://www.hashicorp.com/blog/dynamic-database-credentials-with-vault-and-kubernetes
 ---
 apiVersion: v1
 kind: ServiceAccount
