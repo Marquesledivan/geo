@@ -1,0 +1,339 @@
+---
+# Source: velero/templates/serviceaccount-server.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: velero
+  labels:
+    app.kubernetes.io/name: velero
+    app.kubernetes.io/instance: velero
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: velero-2.23.12
+---
+# Source: velero/templates/clusterrolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: velero-server
+  labels:
+    app.kubernetes.io/component: server
+    app.kubernetes.io/name: velero
+    app.kubernetes.io/instance: velero
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: velero-2.23.12
+subjects:
+  - kind: ServiceAccount
+    namespace: default
+    name: velero
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: velero/templates/role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: velero-server
+  labels:
+    app.kubernetes.io/component: server
+    app.kubernetes.io/name: velero
+    app.kubernetes.io/instance: velero
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: velero-2.23.12
+rules:
+- apiGroups:
+    - "*"
+  resources:
+    - "*"
+  verbs:
+    - "*"
+---
+# Source: velero/templates/rolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: velero-server
+  labels:
+    app.kubernetes.io/component: server
+    app.kubernetes.io/name: velero
+    app.kubernetes.io/instance: velero
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: velero-2.23.12
+subjects:
+  - kind: ServiceAccount
+    namespace: default
+    name: velero
+roleRef:
+  kind: Role
+  name: velero-server
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: velero/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: velero
+  labels:
+    app.kubernetes.io/name: velero
+    app.kubernetes.io/instance: velero
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: velero-2.23.12
+spec:
+  type: ClusterIP
+  ports:
+    - name: monitoring
+      port: 8085
+      targetPort: monitoring
+  selector:
+    name: velero
+    app.kubernetes.io/name: velero
+    app.kubernetes.io/instance: velero
+---
+# Source: velero/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: velero
+  labels:
+    app.kubernetes.io/name: velero
+    app.kubernetes.io/instance: velero
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: velero-2.23.12
+    component: velero
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: velero
+      app.kubernetes.io/name: velero
+  template:
+    metadata:
+      labels:
+        name: velero
+        app.kubernetes.io/name: velero
+        app.kubernetes.io/instance: velero
+        app.kubernetes.io/managed-by: Helm
+        helm.sh/chart: velero-2.23.12
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: "8085"
+        prometheus.io/scrape: "true"
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/agent-inject-secret-cloud-file: "aws/creds/role"
+        vault.hashicorp.com/agent-inject-template-cloud-file: |
+             {{ with secret "aws/creds/role" -}}
+             [default]
+             aws_access_key_id={{ .Data.access_key }}
+             aws_secret_access_key={{ .Data.secret_key }}
+             {{- end }}
+        vault.hashicorp.com/role: "web"
+        vault.hashicorp.com/secret-volume-path: /credentials/cloud
+    spec:
+      restartPolicy: Always
+      serviceAccountName: velero
+      containers:
+        - name: velero
+          image: "velero/velero:v1.6.3"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: monitoring
+              containerPort: 8085
+          command:
+            - /velero
+          args:
+            - server
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 512Mi
+            requests:
+              cpu: 500m
+              memory: 128Mi
+          volumeMounts:
+            - name: plugins
+              mountPath: /plugins
+            - name: cloud-credentials
+              mountPath: /credentials
+            - name: scratch
+              mountPath: /scratch
+          env:
+            - name: VELERO_SCRATCH_DIR
+              value: /scratch
+            - name: VELERO_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+            - name: LD_LIBRARY_PATH
+              value: /plugins
+            - name: AWS_SHARED_CREDENTIALS_FILE
+              value: /credentials/cloud/cloud-file
+      dnsPolicy: ClusterFirst
+      initContainers:
+        - image: velero/velero-plugin-for-aws:v1.2.0
+          imagePullPolicy: IfNotPresent
+          name: velero-plugin-for-aws
+          volumeMounts:
+          - mountPath: /target
+            name: plugins
+      volumes:
+        - name: cloud-credentials
+          secret:
+            secretName: velero
+        - name: plugins
+          emptyDir: {}
+        - name: scratch
+          emptyDir: {}
+---
+# Source: velero/templates/cleanup-crds.yaml
+# This job is meant primarily for cleaning up on CI systems.
+# Using this on production systems, especially those that have multiple releases of Velero, will be destructive.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: velero-cleanup-crds
+  namespace: default
+  annotations:
+    "helm.sh/hook": pre-delete
+    "helm.sh/hook-delete-policy": hook-succeeded
+  labels:
+    app.kubernetes.io/name: velero
+    app.kubernetes.io/instance: velero
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: velero-2.23.12
+spec:
+  backoffLimit: 3
+  template:
+    metadata:
+      name: velero-cleanup-crds
+    spec:
+      serviceAccountName: velero
+      containers:
+        - name: kubectl
+          image: "docker.io/bitnami/kubectl:latest"
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -c
+            - >
+              kubectl delete restore --all;
+              kubectl delete backup --all;
+              kubectl delete backupstoragelocation --all;
+              kubectl delete volumesnapshotlocation --all;
+              kubectl delete podvolumerestore --all;
+              kubectl delete crd -l app.kubernetes.io/name=velero;
+      restartPolicy: OnFailure
+---
+# Source: velero/templates/upgrade-crds.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: velero-upgrade-crds
+  namespace: default
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade,post-rollback
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+  labels:
+    app.kubernetes.io/name: velero
+    app.kubernetes.io/instance: velero
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: velero-2.23.12
+spec:
+  backoffLimit: 3
+  template:
+    metadata:
+      name: velero-upgrade-crds
+    spec:
+      serviceAccountName: velero
+      initContainers:
+        - name: velero
+          image: "velero/velero:v1.6.3"
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -c
+            - /velero install --crds-only --dry-run -o yaml > /tmp/crds.yaml
+          volumeMounts:
+            - mountPath: /tmp
+              name: crds
+      containers:
+        - name: kubectl
+          image: "docker.io/bitnami/kubectl:latest"
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -c
+            - kubectl apply -f /tmp/crds.yaml
+          volumeMounts:
+            - mountPath: /tmp
+              name: crds
+      volumes:
+        - name: crds
+          emptyDir: {}
+      restartPolicy: OnFailure
+---
+# Source: velero/templates/backupstoragelocation.yaml
+apiVersion: velero.io/v1
+kind: BackupStorageLocation
+metadata:
+  name: default
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade,post-rollback
+    "helm.sh/hook-delete-policy": before-hook-creation
+  labels:
+    app.kubernetes.io/name: velero
+    app.kubernetes.io/instance: velero
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: velero-2.23.12
+spec:
+  provider: aws
+  objectStorage:
+    bucket: "chartmuseum-ledivan"
+  config:
+    region: "us-east-1"
+---
+# Source: velero/templates/schedule.yaml
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: velero-infra-cluster-backup
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade,post-rollback
+    "helm.sh/hook-delete-policy": before-hook-creation
+  labels:
+    app.kubernetes.io/name: velero
+    app.kubernetes.io/instance: velero
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: velero-2.23.12
+spec:
+  schedule: "0 */6 * * *"
+  template:
+    defaultVolumesToRestic: false
+    excludedNamespaces:
+    - kube-system
+    - kube-public
+    - velero
+    includeClusterResources: true
+    storageLocation: default
+    ttl: 240h
+    volumeSnapshotLocations:
+    - aws
+---
+# Source: velero/templates/volumesnapshotlocation.yaml
+apiVersion: velero.io/v1
+kind: VolumeSnapshotLocation
+metadata:
+  name: aws
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade,post-rollback
+    "helm.sh/hook-delete-policy": before-hook-creation
+  labels:
+    app.kubernetes.io/name: velero
+    app.kubernetes.io/instance: velero
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: velero-2.23.12
+spec:
+  provider: aws
+  config:
+    region: "us-east-1"
