@@ -1,3 +1,21 @@
+#######
+spec:
+  template:
+    metadata:
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/agent-inject-secret-cloud-file: "aws/creds/role"
+        vault.hashicorp.com/agent-inject-template-cloud-file: |
+             {{ with secret "aws/creds/role" -}}
+             [default]
+             aws_access_key_id={{ .Data.access_key }}
+             aws_secret_access_key={{ .Data.secret_key }}
+             {{- end }}
+        vault.hashicorp.com/role: "web"
+        vault.hashicorp.com/secret-volume-path: /credentials/cloud
+   
+kubectl patch deployment velero --patch "(cat patch.yaml)"
+
 ---
 # Source: velero/templates/serviceaccount-server.yaml
 apiVersion: v1
