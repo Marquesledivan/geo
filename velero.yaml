@@ -13,9 +13,18 @@ spec:
              {{- end }}
         vault.hashicorp.com/role: "web"
         vault.hashicorp.com/secret-volume-path: /credentials
+    spec:
+      containers:
+        - name: velero
+          env:
+            - name: AWS_SHARED_CREDENTIALS_FILE
+              value: /credentials/cloud
    
-kubectl patch deployment velero --patch "(cat patch.yaml)"
-
+kubectl patch deployment velero --patch "$(cat patch.yaml)"
+#
+credentials:
+  useSecret: false
+#
 ---
 # Source: velero/templates/serviceaccount-server.yaml
 apiVersion: v1
