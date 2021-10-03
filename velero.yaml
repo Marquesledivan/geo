@@ -4,15 +4,15 @@ spec:
     metadata:
       annotations:
         vault.hashicorp.com/agent-inject: "true"
-        vault.hashicorp.com/agent-inject-secret-cloud-file: "aws/creds/role"
-        vault.hashicorp.com/agent-inject-template-cloud-file: |
+        vault.hashicorp.com/agent-inject-secret-cloud: "aws/creds/role"
+        vault.hashicorp.com/agent-inject-template-cloud: |
              {{ with secret "aws/creds/role" -}}
              [default]
              aws_access_key_id={{ .Data.access_key }}
              aws_secret_access_key={{ .Data.secret_key }}
              {{- end }}
         vault.hashicorp.com/role: "web"
-        vault.hashicorp.com/secret-volume-path: /credentials/cloud
+        vault.hashicorp.com/secret-volume-path: /credentials
    
 kubectl patch deployment velero --patch "(cat patch.yaml)"
 
@@ -138,15 +138,15 @@ spec:
         prometheus.io/port: "8085"
         prometheus.io/scrape: "true"
         vault.hashicorp.com/agent-inject: "true"
-        vault.hashicorp.com/agent-inject-secret-cloud-file: "aws/creds/role"
-        vault.hashicorp.com/agent-inject-template-cloud-file: |
+        vault.hashicorp.com/agent-inject-secret-cloud: "aws/creds/role"
+        vault.hashicorp.com/agent-inject-template-cloud: |
              {{ with secret "aws/creds/role" -}}
              [default]
              aws_access_key_id={{ .Data.access_key }}
              aws_secret_access_key={{ .Data.secret_key }}
              {{- end }}
         vault.hashicorp.com/role: "web"
-        vault.hashicorp.com/secret-volume-path: /credentials/cloud
+        vault.hashicorp.com/secret-volume-path: /credentials
     spec:
       restartPolicy: Always
       serviceAccountName: velero
@@ -171,8 +171,8 @@ spec:
           volumeMounts:
             - name: plugins
               mountPath: /plugins
-            - name: cloud-credentials
-              mountPath: /credentials
+            #- name: cloud-credentials
+            #  mountPath: /credentials
             - name: scratch
               mountPath: /scratch
           env:
@@ -186,7 +186,7 @@ spec:
             - name: LD_LIBRARY_PATH
               value: /plugins
             - name: AWS_SHARED_CREDENTIALS_FILE
-              value: /credentials/cloud/cloud-file
+              value: /credentials/cloud
       dnsPolicy: ClusterFirst
       initContainers:
         - image: velero/velero-plugin-for-aws:v1.2.0
@@ -196,9 +196,9 @@ spec:
           - mountPath: /target
             name: plugins
       volumes:
-        - name: cloud-credentials
-          secret:
-            secretName: velero
+        #- name: cloud-credentials
+        #  secret:
+        #    secretName: velero
         - name: plugins
           emptyDir: {}
         - name: scratch
