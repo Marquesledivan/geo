@@ -55,8 +55,8 @@ def _bucket(s3_folder,local_file_path):
   for content in response["Contents"]:
       lastmodified = (content["LastModified"]).replace(tzinfo = None)
       date_limit = datetime.now() - timedelta(int("0"))
-      if lastmodified < date_limit:
-          s3_client.delete_objects(Bucket=bucket_name,Delete={'Objects': [{'Key': content["Key"],},], },)
+      if lastmodified <= date_limit:
+          s3_client.delete_objects(Bucket=bucket_name,Delete={'Objects': [{'Key': content["Key"]}]})
   if os.path.exists(apis+ ".zip"):
       os.remove(apis + ".zip")
   if os.path.exists(dir_name):
