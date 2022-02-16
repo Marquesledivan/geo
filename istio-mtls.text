@@ -1,0 +1,33 @@
+openssl req -x509 -sha256 -newkey rsa:4096 -keyout ca.key -out ca.crt -days 356 -nodes -subj '/CN=Quanto DEV Cert Authority'
+
+openssl req -new -newkey rsa:4096 -keyout server.key -out server.csr -nodes -subj '/CN=teste.ledivan.dev.teste.net' -config san.cnf
+
+openssl x509 -req -sha256 -days 365 -in server.csr -CA ca.crt -CAkey ca.key -set_serial 01 -out server.crt
+openssl req -new -newkey rsa:4096 -keyout client.key -out client.csr -nodes -subj '/CN=teste.ledivan.dev.teste.net'
+openssl x509 -req -sha256 -days 365 -in client.csr -CA ca.crt -CAkey ca.key -set_serial 02 -out client.crt
+
+kubectl create secret generic tls-t-api-mock --from-file=tls.crt=server.crt --from-file=tls.key=server.key --from-file=ca.crt=ca.crt -n istio-system
+
+
+https://istio.io/latest/docs/tasks/traffic-management/ingress/secure-ingress/#configure-a-mutual-tls-ingress-gateway
+
+https://istio.io/latest/docs/tasks/traffic-management/ingress/secure-ingress/#configure-a-tls-ingress-gateway-for-a-single-host
+
+
+````
+[ req ]
+default_bits       = 4096
+distinguished_name = req_distinguished_name
+req_extensions     = req_ext
+[ req_distinguished_name ]
+countryName             = "BR"
+stateOrProvinceName     = "SP"
+localityName            = "Sao Paulo"
+organizationName        = "Quanto"
+commonName              = "mock.tsp.dev.contaquanto.net"
+[ req_ext ]
+subjectAltName = @alt_names
+[alt_names]
+DNS.1   = mock.tsp.dev.contaquanto.net
+
+````
