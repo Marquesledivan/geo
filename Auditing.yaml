@@ -1,0 +1,21 @@
+#### https://kubernetes.io/docs/tasks/debug-application-cluster/audit/
+### https://arabitnetwork.com/2021/03/13/k8s-enabling-auditing-logs-step-by-step/
+
+``````
+    - --audit-policy-file=/kube/audit/policy.yaml
+    - --audit-log-path=/kube/audit/logs/audit.log
+    - --audit-log-maxage=3
+    - --audit-log-maxbackup=10
+    - --audit-log-maxsize=10
+    
+    
+    volumeMounts:
+    - name: audit
+      mountPath: /kube/audit
+
+  volumes:
+  - name: audit
+    hostPath:
+      path: /kube/audit
+      type: DirectoryOrCreate
+``````
