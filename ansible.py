@@ -1,3 +1,10 @@
+##############
+aws ec2 describe-network-interfaces | jq --raw-output  '[.NetworkInterfaces[].Association.PublicIp]' | grep -v null | sed 's/\"//g' | sed 's/\,//g'
+
+aws ec2 describe-addresses | jq --raw-output '[.Addresses[].PublicIp]' | sed 's/\"//g' | sed 's/\,//g'
+##############
+
+
 #####
 # 099720109477
 grep -oE "ssl-cert\\S*postgres" /etc/group
