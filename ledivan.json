@@ -1,0 +1,190 @@
+PUT _index_template/ledivan
+{
+  "index_patterns": [
+    "quanto-platform-app-*"
+  ],
+  "template": {
+    "aliases": {
+    },
+    "settings" : {
+        "index.mapping.total_fields.limit" : "2000"
+      },
+        "mappings": {
+          "dynamic": false,
+          "properties": {
+            "time" : {
+              "type" : "date"
+            }, 
+            "level" : {
+              "type" : "text",
+              "fields" : {
+                "keyword" : {
+                  "type" : "keyword",
+                  "ignore_above" : 20
+                }
+              }
+            },
+            "traceID" : {
+              "type" : "text",
+              "fields" : {
+                "keyword" : {
+                  "type" : "keyword",
+                  "ignore_above" : 60
+                }
+              }
+            },
+            "customerID" : {
+              "type" : "text",
+              "fields" : {
+                "keyword" : {
+                  "type" : "keyword",
+                  "ignore_above" : 60
+                }
+              }
+            },
+            "message" : {
+              "type" : "text",
+              "fields" : {
+                "keyword" : {
+                  "type" : "keyword",
+                  "ignore_above" : 500
+                }
+              }
+            },
+            "error.type" : {
+              "type" : "text",
+              "fields" : {
+                "keyword" : {
+                  "type" : "keyword",
+                  "ignore_above" : 60
+                }
+              }
+            },
+            "error.message" : {
+              "type" : "text",
+              "fields" : {
+                "keyword" : {
+                  "type" : "keyword",
+                  "ignore_above" : 100
+                }
+              }
+            },
+            "identifiers" : {
+              "type" : "object",
+              "dynamic": true
+            },
+            "timestamp" : {
+              "type" : "date"
+            }, 
+            "kubernetes.namespace" : {
+              "type" : "text",
+              "fields" : {
+                "keyword" : {
+                  "type" : "keyword",
+                  "ignore_above" : 60
+                }
+              }
+            },
+            "kubernetes.container_name" : {
+              "type" : "text",
+              "fields" : {
+                "keyword" : {
+                  "type" : "keyword",
+                  "ignore_above" : 80
+                }
+              }
+            },
+            "kubernetes.container_image" : {
+              "type" : "text",
+              "fields" : {
+                "keyword" : {
+                  "type" : "keyword",
+                  "ignore_above" : 60
+                }
+              }
+            },
+            "kubernetes.pod_name" : {
+              "type" : "text",
+              "fields" : {
+                "keyword" : {
+                  "type" : "keyword",
+                  "ignore_above" : 60
+                }
+              }
+            },
+            "requestID" : {
+              "type" : "text",
+              "fields" : {
+                "keyword" : {
+                  "type" : "keyword",
+                  "ignore_above" : 60
+                }
+              }
+            },
+            "protocol" : {
+              "type" : "text",
+              "fields" : {
+                "keyword" : {
+                  "type" : "keyword",
+                  "ignore_above" : 60
+                }
+              }
+            },
+            "method" : {
+              "type" : "text",
+              "fields" : {
+                "keyword" : {
+                  "type" : "keyword",
+                  "ignore_above" : 60
+                }
+              }
+            },
+            "path" : {
+              "type" : "text",
+              "fields" : {
+                "keyword" : {
+                  "type" : "keyword",
+                  "ignore_above" : 60
+                }
+              }
+            },
+            "response_code" : {
+              "type" : "text",
+              "fields" : {
+                "keyword" : {
+                  "type" : "keyword",
+                  "ignore_above" : 60
+                }
+              }
+            },
+            "duration" : {
+              "type" : "text",
+              "fields" : {
+                "keyword" : {
+                  "type" : "keyword",
+                  "ignore_above" : 60
+                }
+              }
+            },
+            "grpc_status" : {
+              "type" : "text",
+              "fields" : {
+                "keyword" : {
+                  "type" : "keyword",
+                  "ignore_above" : 60
+                }
+              }
+            },
+            "response_flags" : {
+              "type" : "text",
+              "fields" : {
+                "keyword" : {
+                  "type" : "keyword",
+                  "ignore_above" : 60
+                }
+              }
+            }
+          }
+      }
+  }
+}
