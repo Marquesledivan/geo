@@ -1,8 +1,15 @@
 ##############
 aws ec2 describe-network-interfaces | jq --raw-output  '[.NetworkInterfaces[].Association.PublicIp]' | grep -v null | sed 's/\"//g' | sed 's/\,//g'
 
+aws ec2 describe-network-interfaces --filters Name=addresses.private-ip-address,Values=1.1.1.1
+
 aws ec2 describe-addresses | jq --raw-output '[.Addresses[].PublicIp]' | sed 's/\"//g' | sed 's/\,//g'
 ##############
+fallocate -l 50G big_file
+
+truncate -s 50G big_file
+
+dd of=bigfile bs=1 seek=50G count=0
 
 
 #####
